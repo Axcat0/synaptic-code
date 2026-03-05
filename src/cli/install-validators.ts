@@ -27,34 +27,34 @@ function formatProvider(name: string, enabled: boolean, detail?: string): string
 export function formatConfigSummary(config: InstallConfig): string {
   const lines: string[] = []
 
-  lines.push(color.bold(color.white("Configuration Summary")))
+  lines.push(color.bold(color.white("配置摘要")))
   lines.push("")
 
-  const claudeDetail = config.hasClaude ? (config.isMax20 ? "max20" : "standard") : undefined
-  lines.push(formatProvider("Claude", config.hasClaude, claudeDetail))
-  lines.push(formatProvider("OpenAI/ChatGPT", config.hasOpenAI, "GPT-5.2 for Oracle"))
+  const nvidiaDetail = config.hasNvidia ? "Nvidia GPU优化" : undefined
+  lines.push(formatProvider("Nvidia", config.hasNvidia, nvidiaDetail))
+  lines.push(formatProvider("OpenAI/ChatGPT", config.hasOpenAI, "GPT-5.2用于咨询模式"))
   lines.push(formatProvider("Gemini", config.hasGemini))
-  lines.push(formatProvider("GitHub Copilot", config.hasCopilot, "fallback"))
-  lines.push(formatProvider("OpenCode Zen", config.hasOpencodeZen, "opencode/ models"))
-  lines.push(formatProvider("Z.ai Coding Plan", config.hasZaiCodingPlan, "Librarian/Multimodal"))
-  lines.push(formatProvider("Kimi For Coding", config.hasKimiForCoding, "Sisyphus/Prometheus fallback"))
+  lines.push(formatProvider("GitHub Copilot", config.hasCopilot, "后备方案"))
+  lines.push(formatProvider("OpenCode Zen", config.hasOpencodeZen, "opencode/模型"))
+  lines.push(formatProvider("Z.ai编程计划", config.hasZaiCodingPlan, "研究模式/视觉分析"))
+  lines.push(formatProvider("Kimi编程", config.hasKimiForCoding, "统策模式/规划模式后备"))
 
   lines.push("")
   lines.push(color.dim("─".repeat(40)))
   lines.push("")
 
-  lines.push(color.bold(color.white("Model Assignment")))
+  lines.push(color.bold(color.white("模型分配")))
   lines.push("")
-  lines.push(`  ${SYMBOLS.info} Models auto-configured based on provider priority`)
-  lines.push(`  ${SYMBOLS.bullet} Priority: Native > Copilot > OpenCode Zen > Z.ai`)
+  lines.push(` ${SYMBOLS.info} 模型根据提供商优先级自动配置`)
+  lines.push(` ${SYMBOLS.bullet} 优先级：原生 > Copilot > OpenCode Zen > Z.ai`)
 
   return lines.join("\n")
 }
 
 export function printHeader(isUpdate: boolean): void {
-  const mode = isUpdate ? "Update" : "Install"
+  const mode = isUpdate ? "更新" : "安装"
   console.log()
-  console.log(color.bgMagenta(color.white(` oMoMoMoMo... ${mode} `)))
+  console.log(color.bgMagenta(color.white(` 统策代理... ${mode} `)))
   console.log()
 }
 
@@ -113,38 +113,38 @@ export function printBox(content: string, title?: string): void {
 export function validateNonTuiArgs(args: InstallArgs): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
-  if (args.claude === undefined) {
-    errors.push("--claude is required (values: no, yes, max20)")
-  } else if (!["no", "yes", "max20"].includes(args.claude)) {
-    errors.push(`Invalid --claude value: ${args.claude} (expected: no, yes, max20)`)
+  if (args.nvidia === undefined) {
+    errors.push("--nvidia 是必需的（值：no, yes）")
+  } else if (!["no", "yes"].includes(args.nvidia)) {
+    errors.push(`无效的 --nvidia 值：${args.nvidia}（预期：no, yes）`)
   }
 
   if (args.gemini === undefined) {
-    errors.push("--gemini is required (values: no, yes)")
+    errors.push("--gemini 是必需的（值：no, yes）")
   } else if (!["no", "yes"].includes(args.gemini)) {
-    errors.push(`Invalid --gemini value: ${args.gemini} (expected: no, yes)`)
+    errors.push(`无效的 --gemini 值：${args.gemini}（预期：no, yes）`)
   }
 
   if (args.copilot === undefined) {
-    errors.push("--copilot is required (values: no, yes)")
+    errors.push("--copilot 是必需的（值：no, yes）")
   } else if (!["no", "yes"].includes(args.copilot)) {
-    errors.push(`Invalid --copilot value: ${args.copilot} (expected: no, yes)`)
+    errors.push(`无效的 --copilot 值：${args.copilot}（预期：no, yes）`)
   }
 
   if (args.openai !== undefined && !["no", "yes"].includes(args.openai)) {
-    errors.push(`Invalid --openai value: ${args.openai} (expected: no, yes)`)
+    errors.push(`无效的 --openai 值：${args.openai}（预期：no, yes）`)
   }
 
   if (args.opencodeZen !== undefined && !["no", "yes"].includes(args.opencodeZen)) {
-    errors.push(`Invalid --opencode-zen value: ${args.opencodeZen} (expected: no, yes)`)
+    errors.push(`无效的 --opencode-zen 值：${args.opencodeZen}（预期：no, yes）`)
   }
 
   if (args.zaiCodingPlan !== undefined && !["no", "yes"].includes(args.zaiCodingPlan)) {
-    errors.push(`Invalid --zai-coding-plan value: ${args.zaiCodingPlan} (expected: no, yes)`)
+    errors.push(`无效的 --zai-coding-plan 值：${args.zaiCodingPlan}（预期：no, yes）`)
   }
 
   if (args.kimiForCoding !== undefined && !["no", "yes"].includes(args.kimiForCoding)) {
-    errors.push(`Invalid --kimi-for-coding value: ${args.kimiForCoding} (expected: no, yes)`)
+    errors.push(`无效的 --kimi-for-coding 值：${args.kimiForCoding}（预期：no, yes）`)
   }
 
   return { valid: errors.length === 0, errors }
@@ -152,14 +152,15 @@ export function validateNonTuiArgs(args: InstallArgs): { valid: boolean; errors:
 
 export function argsToConfig(args: InstallArgs): InstallConfig {
   return {
-    hasClaude: args.claude !== "no",
-    isMax20: args.claude === "max20",
+    hasClaude: args.nvidia === "yes",
+    isMax20: false,
     hasOpenAI: args.openai === "yes",
     hasGemini: args.gemini === "yes",
     hasCopilot: args.copilot === "yes",
     hasOpencodeZen: args.opencodeZen === "yes",
     hasZaiCodingPlan: args.zaiCodingPlan === "yes",
     hasKimiForCoding: args.kimiForCoding === "yes",
+    hasNvidia: args.nvidia === "yes",
   }
 }
 
@@ -171,6 +172,7 @@ export function detectedToInitialValues(detected: DetectedConfig): {
   opencodeZen: BooleanArg
   zaiCodingPlan: BooleanArg
   kimiForCoding: BooleanArg
+  nvidia: BooleanArg
 } {
   let claude: ClaudeSubscription = "no"
   if (detected.hasClaude) {
@@ -185,5 +187,6 @@ export function detectedToInitialValues(detected: DetectedConfig): {
     opencodeZen: detected.hasOpencodeZen ? "yes" : "no",
     zaiCodingPlan: detected.hasZaiCodingPlan ? "yes" : "no",
     kimiForCoding: detected.hasKimiForCoding ? "yes" : "no",
+    nvidia: detected.hasNvidia ? "yes" : "no",
   }
 }

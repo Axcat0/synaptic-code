@@ -46,6 +46,7 @@ export function detectCurrentConfig(): DetectedConfig {
     hasOpencodeZen: true,
     hasZaiCodingPlan: false,
     hasKimiForCoding: false,
+    hasNvidia: false,
   }
 
   const { format, path } = detectConfigFormat()

@@ -20,7 +20,7 @@ async function selectOrCancel<TValue extends Readonly<string | boolean | number>
     initialValue: params.initialValue,
   })
   if (p.isCancel(value)) {
-    p.cancel("Installation cancelled.")
+    p.cancel("安装已取消。")
     return null
   }
   return value as TValue
@@ -29,85 +29,85 @@ async function selectOrCancel<TValue extends Readonly<string | boolean | number>
 export async function promptInstallConfig(detected: DetectedConfig): Promise<InstallConfig | null> {
   const initial = detectedToInitialValues(detected)
 
-  const claude = await selectOrCancel<ClaudeSubscription>({
-    message: "Do you have a Claude Pro/Max subscription?",
+  const nvidia = await selectOrCancel({
+    message: "您是否使用Nvidia GPU进行AI推理？",
     options: [
-      { value: "no", label: "No", hint: "Will use opencode/big-pickle as fallback" },
-      { value: "yes", label: "Yes (standard)", hint: "Claude Opus 4.5 for orchestration" },
-      { value: "max20", label: "Yes (max20 mode)", hint: "Full power with Claude Sonnet 4.6 for Librarian" },
+      { value: "no", label: "否，使用云端模型", hint: "将自动配置云端模型后备方案" },
+      { value: "yes", label: "是，本地GPU加速", hint: "启用本地GPU推理，降低延迟和成本" },
     ],
-    initialValue: initial.claude,
+    initialValue: initial.claude === "yes" || initial.claude === "max20" ? "yes" : "no",
   })
-  if (!claude) return null
+  if (!nvidia) return null
 
   const openai = await selectOrCancel({
-    message: "Do you have an OpenAI/ChatGPT Plus subscription?",
+    message: "是否配置OpenAI模型服务？",
     options: [
-      { value: "no", label: "No", hint: "Oracle will use fallback models" },
-      { value: "yes", label: "Yes", hint: "GPT-5.2 for Oracle (high-IQ debugging)" },
+      { value: "no", label: "不需要", hint: "咨询顾问将使用其他模型" },
+      { value: "yes", label: "需要", hint: "启用GPT-5.2，用于架构咨询和复杂调试" },
     ],
     initialValue: initial.openai,
   })
   if (!openai) return null
 
   const gemini = await selectOrCancel({
-    message: "Will you integrate Google Gemini?",
+    message: "是否启用Google Gemini服务？",
     options: [
-      { value: "no", label: "No", hint: "Frontend/docs agents will use fallback" },
-      { value: "yes", label: "Yes", hint: "Beautiful UI generation with Gemini 3 Pro" },
+      { value: "no", label: "不启用", hint: "前端开发将使用其他模型" },
+      { value: "yes", label: "启用", hint: "用于UI/UX开发和视觉设计任务" },
     ],
     initialValue: initial.gemini,
   })
   if (!gemini) return null
 
   const copilot = await selectOrCancel({
-    message: "Do you have a GitHub Copilot subscription?",
+    message: "是否配置GitHub Copilot作为备用？",
     options: [
-      { value: "no", label: "No", hint: "Only native providers will be used" },
-      { value: "yes", label: "Yes", hint: "Fallback option when native providers unavailable" },
+      { value: "no", label: "不配置", hint: "仅使用主要模型服务" },
+      { value: "yes", label: "配置", hint: "作为备用方案，提高服务可用性" },
     ],
     initialValue: initial.copilot,
   })
   if (!copilot) return null
 
   const opencodeZen = await selectOrCancel({
-    message: "Do you have access to OpenCode Zen (opencode/ models)?",
+    message: "是否接入OpenCode Zen模型池？",
     options: [
-      { value: "no", label: "No", hint: "Will use other configured providers" },
-      { value: "yes", label: "Yes", hint: "opencode/claude-opus-4-6, opencode/gpt-5.2, etc." },
+      { value: "no", label: "不接入", hint: "使用其他已配置的服务" },
+      { value: "yes", label: "接入", hint: "访问opencode系列优化模型" },
     ],
     initialValue: initial.opencodeZen,
   })
   if (!opencodeZen) return null
 
   const zaiCodingPlan = await selectOrCancel({
-    message: "Do you have a Z.ai Coding Plan subscription?",
+    message: "是否启用Z.ai文档检索服务？",
     options: [
-      { value: "no", label: "No", hint: "Will use other configured providers" },
-      { value: "yes", label: "Yes", hint: "Fallback for Librarian and Multimodal Looker" },
+      { value: "no", label: "不启用", hint: "文档搜索将使用其他服务" },
+      { value: "yes", label: "启用", hint: "用于文档研究和多模态分析" },
     ],
     initialValue: initial.zaiCodingPlan,
   })
   if (!zaiCodingPlan) return null
 
   const kimiForCoding = await selectOrCancel({
-    message: "Do you have a Kimi For Coding subscription?",
+    message: "是否配置Kimi长文本模型？",
     options: [
-      { value: "no", label: "No", hint: "Will use other configured providers" },
-      { value: "yes", label: "Yes", hint: "Kimi K2.5 for Sisyphus/Prometheus fallback" },
+      { value: "no", label: "不配置", hint: "长文本任务使用其他服务" },
+      { value: "yes", label: "配置", hint: "用于协调和规划任务，支持超长上下文" },
     ],
     initialValue: initial.kimiForCoding,
   })
   if (!kimiForCoding) return null
 
   return {
-    hasClaude: claude !== "no",
-    isMax20: claude === "max20",
+    hasClaude: nvidia === "yes",
+    isMax20: false,
     hasOpenAI: openai === "yes",
     hasGemini: gemini === "yes",
     hasCopilot: copilot === "yes",
     hasOpencodeZen: opencodeZen === "yes",
     hasZaiCodingPlan: zaiCodingPlan === "yes",
     hasKimiForCoding: kimiForCoding === "yes",
+    hasNvidia: nvidia === "yes",
   }
 }
