@@ -1,0 +1,25 @@
+{
+  "name": "synaptic-code-linux-x64-baseline",
+  "version": "3.10.0",
+  "description": "Platform-specific binary for synaptic-code (linux-x64-baseline, no AVX2)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com//synaptic-code"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "files": [
+    "bin"
+  ],
+  "bin": {
+    "synaptic-code": "./bin/synaptic-code"
+  }
+}
